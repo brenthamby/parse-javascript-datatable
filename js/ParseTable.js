@@ -12,7 +12,7 @@ function ParseTable(opts){
 		el : undefined, // element within which to place the table
 		cols:[], // if not supplied will just derive order and names from server
 		deletable : false, // if true, delete button will appear
-		editable  : false, // if true, inline editting will appear
+		editable  : false, // if true, inline editing will appear
 		displayInterceptors:{},
 		updateInterceptors:{}
 	}
@@ -26,7 +26,7 @@ function ParseTable(opts){
 	this.pageSize=1;
 	this.sortBy;
 	this.loading=false;
-	this.editting=false;
+	this.editing=false;
 	this.results; // parse results
 	this.render();
 }
@@ -65,7 +65,7 @@ ParseTable.prototype={
 	},
 	update:function(e){
 		e.stopPropagation()
-		this.editting=false
+		this.editing=false
 		if($(e.target).hasClass("js-cancel")){
 			this.DOM.find(".pt_edit").remove()
 		} else {
@@ -86,8 +86,8 @@ ParseTable.prototype={
 	},
 	edit:function(e){
 		e.preventDefault()
-		if(this.loading || this.editting) return
-		this.editting=true
+		if(this.loading || this.editing) return
+		this.editing=true
 		var target = $(e.target);
 		var col = $(e.target).data("colname") 
 		if(this.opts.updateInterceptors[col]){
@@ -97,7 +97,7 @@ ParseTable.prototype={
 				col: col,
 				el:target
 			})
-			this.editting=false
+			this.editing=false
 			return;
 		}
 		var editor = _.template(
