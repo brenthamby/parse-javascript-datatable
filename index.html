@@ -12,9 +12,9 @@
 	$(document).ready(function(){
 
 	    
-		var applicationId = ""
-		var javaScriptKey = "" 
-		var tableName = ""
+		var applicationId = "1ewLtGnrgPJmDPURAlYA6ebxydeAUddpd1lMwBum"
+		var javaScriptKey = "0LuS2SB3lO4mhEd9uKfeEFf2ehXOJuAK1pnLsNyg" 
+		var tableName = "Address"
 
 		if(!applicationId || !javaScriptKey || !tableName){
 			alert("to try this out please enter your parse.com credentials:"
@@ -31,27 +31,35 @@
 	    	javaScriptKey 
 		);
 
-		new ParseTable({
+		pt = new ParseTable({
 			el : $("#table"),
 			parseObjName : tableName,
 			deletable : true,
 			editable : true,
-			/*
-			displayInterceptors : {
-				someCol : function(d){
-					return d.substring(0,10)+"..."
-				},			
-				anotherCol : function(d){
-					return "<a href=d>click here</a>"
-				},			
+			cols : ['Street','City','State','PostalCode','Country'],
+			displayInterceptors:{
+				City : function(d){
+					return d.substring(0,4)+"..."
+				}
 			},
-			updateInterceptors:{
-				yetAnotherCol : function(obj){
-					alert("I will make my own editor to handle this column\n\ncolumn: "+obj.col+"\n\nparse obj id: "+obj.parseObj.id)
+			editInterceptors:{
+				State : function(obj){
+					var target = obj.el;  // DOM ref to the cell
+					var parseObj = obj.parseObj; // parse instance
+					var col = obj.col;  // column name in question
+					var val = target.data("rawdata"); // raw data (diff if was displayIntercepted)
+					var myEdit = $("<select class='pt_edit'><option>CA<option>NY<option>VT</select>")
+						.val(target.html().trim()).change(function(){
+						parseObj.set(obj.col,$(this).val())
+						parseObj.save()
+						pt.editing=false
+						pt.render()
+					})
+					target.append(myEdit)
+
 				}
 			}
-			*/
-		})		
+		})
 	})
 
 	</script>
@@ -86,10 +94,12 @@
 	<script type="text/template" class="pt_table_container">
 		<div class=pt_container>
 			<div class=pt_controls id=pt_controls<%- rc.id %>>
-				<button id=pt_controls_loading<%- rc.id %>><img src='images/spinny.gif'/></button>
+				<img src='images/spinny.gif' id=pt_controls_loading<%- rc.id %>>
 				<button id=pt_controls_prev<%- rc.id %>>prev</button>
 				<button id=pt_controls_next<%- rc.id %>>next</button>
 				<select id=pt_controls_size<%- rc.id %>>
+					<option>2</option>
+					<option>3</option>
 					<option>5</option>
 					<option>10</option>
 					<option>20</option>
@@ -138,7 +148,7 @@
 			%>				
 				<td>
 				<div data-rawdata='<%- item.rawdata %>' data-colname=<%- item.col %> class="pt_cell <% if (rc.editable) {%> js-editable<%}%>">
-					<%- item.display %>
+					<%= item.display %>
 				</div>
 				</td>
 			<% }) %>
