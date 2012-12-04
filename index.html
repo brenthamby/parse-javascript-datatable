@@ -43,6 +43,65 @@
 <li>relies on jquery, underscore, underscore templates and of course parse.com</li>
 </ul><p><img src="http://www.brenthamby.com/dt.png" alt="table"></p>
 
+<p>`
+function(){</p>
+
+<p>}
+`</p>
+
+<p>This is the basic usage:</p>
+
+<pre>
+    pt = new ParseTable({
+        el : $("#table"), // where to place on the page (fills space)
+        parseObjName : "NAME_OF_TABLE",
+        deletable : true, //  defaults to false (allows deleting if true)
+        editable : true,  //  defaults to false (allows editing if true)
+    ...
+</pre>
+
+<p>By default it will inspect the table and present all of the columns for display and editing.  You can enforce order or omit columns using:</p>
+
+<pre>
+    ...
+    cols : ['Street','City','State','PostalCode','Country'],
+</pre>
+
+<p>What is really powerful is the interceptors which allow you to customize the way the data is displayed and the method and UI for editing the data. For instance you may want to shorten long text entries so as not to distort the table:</p>
+
+<pre>
+    ...
+    displayInterceptors:{
+        SOME_LONG_COLUMN : function(d){
+            return d.substring(0,20)+"..."
+        }
+    },
+ 
+</pre>
+
+<p>Or present a drop down list for some other enumerated column:</p>
+
+<pre>
+    ...
+    editInterceptors:{
+        State : function(obj){
+            var target = obj.el;  // DOM ref to the cell
+            var parseObj = obj.parseObj; // parse instance
+            var col = obj.col;  // column name in question
+            var val = target.data("rawdata"); // raw data (diff if was displayIntercepted)
+            var myEdit = $("&lt;select class='pt_edit'&gt;&lt;option&gt;CA&lt;option&gt;NY&lt;option&gt;VT&lt;/select&gt;")
+                .val(target.html().trim()).change(function(){
+                parseObj.set(obj.col,$(this).val())
+                parseObj.save()
+                pt.editing=false    
+                pt.render()
+            })
+            target.append(myEdit)
+        }
+    }
+
+</pre>
+
 <h3>Authors and Contributors</h3>
 
 <p><a href="https://github.com/brenthamby" class="user-mention">@brenthamby</a></p>
